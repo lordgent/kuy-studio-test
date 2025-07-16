@@ -5,6 +5,7 @@ import EditModal from "@/components/EditModal";
 import ProfileHeader from "@/components/ProfileHeader";
 import TaskModal from "@/components/TaskModal";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Task {
   id: number;
@@ -22,8 +23,7 @@ export default function DashboardPage() {
   const [showActionModal, setShowActionModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const router = useRouter(); 
 
   const fetchTasks = async () => {
     try {
@@ -37,7 +37,7 @@ export default function DashboardPage() {
       setTasks(data.data ?? data);
     } catch (err) {
       console.error(err);
-      setError("Gagal mengambil data task.");
+      setError("Not Found");
     }
   };
 
@@ -54,7 +54,7 @@ export default function DashboardPage() {
         },
       });
 
-      if (!res.ok) throw new Error("Gagal menghapus task");
+
 
       fetchTasks();
     } catch (err) {
@@ -113,6 +113,18 @@ export default function DashboardPage() {
       alert("Gagal update task.");
     }
   };
+
+   const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  useEffect(() => {
+    if (!token) {
+      router.push("/login"); 
+      return;
+    }
+
+    fetchTasks();
+  }, []);
 
   return (
     <main className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
